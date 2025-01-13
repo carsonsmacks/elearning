@@ -70,8 +70,13 @@
         return;
       }
 
-      // Fetch the HTML content from the entered URL
-      fetch(url)
+      // Using CORS Anywhere proxy to bypass CORS
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const targetUrl = url;
+      const fullUrl = proxyUrl + targetUrl;
+
+      // Fetch the HTML content from the entered URL using the proxy
+      fetch(fullUrl)
         .then(response => {
           if (!response.ok) {
             throw new Error("Failed to fetch the URL.");
