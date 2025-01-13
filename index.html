@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google</title>
+  <title>Fetch and Run Code</title>
   <style>
     /* Global Styles */
     body {
@@ -18,7 +18,6 @@
       text-align: center;
     }
 
-    /* Container for the whole search area */
     .search-container {
       background-color: white;
       padding: 40px;
@@ -27,14 +26,6 @@
       text-align: center;
     }
 
-    /* Logo Image */
-    .logo {
-      width: 80px;
-      height: auto;
-      margin-bottom: 20px;
-    }
-
-    /* Search Bar Styles */
     .search-bar {
       width: 300px;
       padding: 10px;
@@ -45,7 +36,6 @@
       outline: none;
     }
 
-    /* Search Button Styles */
     .search-btn {
       padding: 10px 20px;
       font-size: 16px;
@@ -60,56 +50,49 @@
     .search-btn:hover {
       background-color: #45a049;
     }
-
-    /* Footer message */
-    .footer {
-      font-size: 14px;
-      color: #777;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
 
   <div class="search-container">
-    <img src="https://cdn.creazilla.com/icons/3269952/google-icon-lg.png" alt="Google Logo" class="logo">
-    
-    <!-- Search Bar Form -->
-    <input type="text" id="searchInput" class="search-bar" placeholder="Search for code..." />
-    <button class="search-btn" onclick="performSearch()">Search</button>
-    
-    <div class="footer">
-      <p>Made By Carson.</p>
-    </div>
+    <h2>Fetch and Run HTML Code</h2>
+    <input type="text" id="searchInput" class="search-bar" placeholder="Enter website URL..." />
+    <button class="search-btn" onclick="performSearch()">Fetch and Run</button>
   </div>
 
   <script>
-    // Function to handle the search and fetch code
+    // Function to fetch the HTML content from the URL and inject it into the page
     function performSearch() {
-      const query = document.getElementById('searchInput').value;
-      if (query.trim() === "") {
-        alert("Please enter a search term.");
+      const url = document.getElementById('searchInput').value.trim();
+
+      if (url === "") {
+        alert("Please enter a URL.");
         return;
       }
 
-      // Example: Fetching from a static GitHub Gist (Replace with actual logic if needed)
-      const url = `https://api.github.com/gists/public`;  // Example URL, replace with actual code URL logic
-
+      // Fetch the HTML content from the entered URL
       fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          // For demo purposes, we'll just log the first gist's content
-          if (data && data.length > 0) {
-            const gist = data[0];
-            const codeContent = gist.files[Object.keys(gist.files)[0]].content;
-            alert("Fetched Code: \n" + codeContent);
-          } else {
-            alert("No code found for this search.");
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch the URL.");
           }
+          return response.text(); // Get the HTML content
+        })
+        .then(content => {
+          // Inject the HTML content into the body of the page
+          document.body.innerHTML = content;
+
+          // Execute any scripts that are part of the fetched content
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.textContent = script.textContent; // Recreate and execute the script
+            document.body.appendChild(newScript);
+          });
         })
         .catch(error => {
-          console.error("Error fetching code:", error);
-          alert("An error occurred while fetching code.");
+          console.error("Error fetching the HTML:", error);
+          alert("An error occurred while fetching or rendering the HTML.");
         });
     }
   </script>
